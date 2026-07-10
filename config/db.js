@@ -6,7 +6,8 @@ const connectDB = async () => {
     console.log(`MongoDB Connecté : ${conn.connection.host}`);
   } catch (error) {
     console.error(`Erreur de connexion à MongoDB : ${error.message}`);
-    process.exit(1);
+    // En production, on ne quitte pas le processus pour que Render reste actif et qu'on puisse diagnostiquer
+    // process.exit(1);
   }
 };
 
