@@ -1,5 +1,6 @@
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 // Helper pour obtenir les créneaux disponibles
 const getAvailableSlotsHelper = async (doctorId, dateStr) => {
@@ -83,6 +84,14 @@ exports.createAppointment = async (req, res) => {
       .populate('doctor', 'name doctorProfile.address doctorProfile.specialty doctorProfile.profileImage')
       .populate('patient', 'name email phone');
 
+    // Créer une notification pour le médecin
+    await Notification.create({
+      recipient: doctorId,
+      title: 'Nouveau rendez-vous',
+      message: `Le patient ${req.user.name} a réservé un rendez-vous pour le ${appointmentDate.toLocaleDateString('fr-FR')} à ${slot}.`,
+      type: 'appointment_created'
+    });
+
     res.status(201).json(populatedAppointment);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -158,6 +167,14 @@ exports.confirmAppointment = async (req, res) => {
     appointment.status = 'confirmed';
     await appointment.save();
 
+    // Créer une notification pour le patient
+    await Notification.create({
+      recipient: appointment.patient,
+      title: 'Rendez-vous validé',
+      message: `Le Dr. ${req.user.name} a validé votre rendez-vous prévu le ${appointment.date.toLocaleDateString('fr-FR')} à ${appointment.slot}.`,
+      type: 'appointment_confirmed'
+    });
+
     res.json({ message: 'Rendez-vous validé avec succès', appointment });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -186,6 +203,38 @@ exports.cancelAppointment = async (req, res) => {
 
     appointment.status = 'cancelled';
     await appointment.save();
+
+    // Créer une notification
+    if (isPatient) {
+      await Notification.create({
+        recipient: appointment.doctor,
+        title: 'Rendez-vous annulé',
+        message: `Le patient ${req.user.name} a annulé le rendez-vous prévu le ${appointment.date.toLocaleDateString('fr-FR')} à ${appointment.slot}.`,
+        type: 'appointment_cancelled'
+      });
+    } else if (isDoctor) {
+      await Notification.create({
+        recipient: appointment.patient,
+        title: 'Rendez-vous annulé',
+        message: `Le Dr. ${req.user.name} a annulé votre rendez-vous prévu le ${appointment.date.toLocaleDateString('fr-FR')} à ${appointment.slot}.`,
+        type: 'appointment_cancelled'
+      });
+    } else if (isAdmin) {
+      // Notifier le patient
+      await Notification.create({
+        recipient: appointment.patient,
+        title: 'Rendez-vous annulé',
+        message: `L'administration a annulé votre rendez-vous prévu le ${appointment.date.toLocaleDateString('fr-FR')} à ${appointment.slot}.`,
+        type: 'appointment_cancelled'
+      });
+      // Notifier le médecin
+      await Notification.create({
+        recipient: appointment.doctor,
+        title: 'Rendez-vous annulé',
+        message: `L'administration a annulé le rendez-vous prévu le ${appointment.date.toLocaleDateString('fr-FR')} à ${appointment.slot}.`,
+        type: 'appointment_cancelled'
+      });
+    }
 
     res.json({ message: 'Rendez-vous annulé avec succès', appointment });
   } catch (error) {

@@ -18,6 +18,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/specialties', require('./routes/specialtyRoutes'));
 app.use('/api/appointments', require('./routes/appointmentRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Route de base de test
 app.get('/', (req, res) => {
