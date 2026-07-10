@@ -80,7 +80,7 @@ exports.createAppointment = async (req, res) => {
     });
 
     const populatedAppointment = await Appointment.findById(appointment._id)
-      .populate('doctor', 'name doctorProfile.address doctorProfile.specialty')
+      .populate('doctor', 'name doctorProfile.address doctorProfile.specialty doctorProfile.profileImage')
       .populate('patient', 'name email phone');
 
     res.status(201).json(populatedAppointment);
@@ -125,7 +125,7 @@ exports.getMyAppointments = async (req, res) => {
       .populate('patient', 'name email phone')
       .populate({
         path: 'doctor',
-        select: 'name doctorProfile.address doctorProfile.specialty',
+        select: 'name doctorProfile.address doctorProfile.specialty doctorProfile.profileImage',
         populate: {
           path: 'doctorProfile.specialty',
           select: 'name icon'
@@ -202,7 +202,7 @@ exports.getAllAppointments = async (req, res) => {
       .populate('patient', 'name email phone')
       .populate({
         path: 'doctor',
-        select: 'name doctorProfile.address doctorProfile.specialty',
+        select: 'name doctorProfile.address doctorProfile.specialty doctorProfile.profileImage',
         populate: {
           path: 'doctorProfile.specialty',
           select: 'name icon'
