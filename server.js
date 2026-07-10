@@ -21,7 +21,7 @@ app.use('/api/appointments', require('./routes/appointmentRoutes'));
 
 // Route de base de test
 app.get('/', (req, res) => {
-  res.send('API MediRdv en ligne !');
+  res.send('API MediRdv en ligne (v2 - limit 10mb) !');
 });
 
 // Middleware de gestion des erreurs global
