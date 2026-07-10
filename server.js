@@ -22,7 +22,7 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Route de base de test
 app.get('/', (req, res) => {
-  res.send('API MediRdv en ligne (v2 - limit 10mb) !');
+  res.send('API MediRdv en ligne (v3 - test notifications) !');
 });
 
 // Middleware de gestion des erreurs global
