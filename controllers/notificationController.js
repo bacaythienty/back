@@ -3,7 +3,7 @@ const Notification = require('../models/Notification');
 // Obtenir toutes les notifications de l'utilisateur connecté
 exports.getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ recipient: req.user.id })
+    const notifications = await Notification.find({ recipient: req.user._id })
       .sort({ createdAt: -1 })
       .limit(50); // Limite aux 50 dernières notifications
     res.json(notifications);
@@ -17,7 +17,7 @@ exports.getNotifications = async (req, res) => {
 exports.markAsRead = async (req, res) => {
   try {
     const notification = await Notification.findOneAndUpdate(
-      { _id: req.params.id, recipient: req.user.id },
+      { _id: req.params.id, recipient: req.user._id },
       { isRead: true },
       { new: true }
     );
@@ -35,7 +35,7 @@ exports.markAsRead = async (req, res) => {
 exports.markAllAsRead = async (req, res) => {
   try {
     await Notification.updateMany(
-      { recipient: req.user.id, isRead: false },
+      { recipient: req.user._id, isRead: false },
       { isRead: true }
     );
     res.json({ message: 'Toutes les notifications ont été marquées comme lues' });
