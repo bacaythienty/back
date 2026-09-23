@@ -30,8 +30,10 @@ exports.getDoctors = async (req, res) => {
 
     const doctors = await User.find(query)
       .populate('doctorProfile.specialty', 'name icon description')
-      .select('-password');
+      .select('-password')
+      .lean();
 
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     res.json(doctors);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -45,9 +47,11 @@ exports.getDoctorById = async (req, res) => {
   try {
     const doctor = await User.findOne({ _id: req.params.id, role: 'doctor' })
       .populate('doctorProfile.specialty', 'name icon description')
-      .select('-password');
+      .select('-password')
+      .lean();
 
     if (doctor) {
+      res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
       res.json(doctor);
     } else {
       res.status(404).json({ message: 'Médecin non trouvé' });

@@ -5,7 +5,8 @@ const Specialty = require('../models/Specialty');
 // @access  Public
 exports.getSpecialties = async (req, res) => {
   try {
-    const specialties = await Specialty.find({});
+    res.set('Cache-Control', 'public, max-age=180, stale-while-revalidate=600');
+    const specialties = await Specialty.find({}).lean();
     res.json(specialties);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -20,9 +20,13 @@ app.use('/api/specialties', require('./routes/specialtyRoutes'));
 app.use('/api/appointments', require('./routes/appointmentRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 
-// Route de base de test
+// Route de base de test et réveil ultra-rapide
 app.get('/', (req, res) => {
   res.send('API MediRdv en ligne (v3 - test notifications) !');
+});
+
+app.get('/api/ping', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() });
 });
 
 // Middleware de gestion des erreurs global

@@ -36,7 +36,7 @@ const getAvailableSlotsHelper = async (doctorId, dateStr) => {
     doctor: doctorId,
     date: { $gte: startOfDay, $lte: endOfDay },
     status: { $in: ['pending', 'confirmed'] }
-  });
+  }).lean();
 
   const bookedSlots = appointments.map((app) => app.slot);
 
@@ -140,7 +140,8 @@ exports.getMyAppointments = async (req, res) => {
           select: 'name icon'
         }
       })
-      .sort({ date: 1, slot: 1 });
+      .sort({ date: 1, slot: 1 })
+      .lean();
 
     res.json(appointments);
   } catch (error) {
